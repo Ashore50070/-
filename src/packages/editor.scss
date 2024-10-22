@@ -1,0 +1,159 @@
+.editor {
+    width: 100%;
+    height: 100%;
+    &-left, &-right {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 250px;
+        background-color: #fef7f7;
+        background: linear-gradient(135deg, #f7f5f8 0%, #dfd9d9 100%);
+        box-shadow: 0 4px 8px rgba(248, 246, 246, 0.1);
+        border-radius: 5px;
+    }
+    &-left {
+        
+        left: 0;
+        color: #000000;
+        border: 1px solid #0a0a0a;
+        &-content {
+            width: 200px;
+            margin: 10px auto; 
+            display: flex; /* 让子元素水平排列 */
+            flex-wrap: wrap; /* 允许换行 */
+            gap: 10px; /* 控制子元素间距 */          
+            &-item {
+                position: relative;
+                width: 40%;
+                height: 100%;
+                padding: 10px;
+                margin-bottom: 10px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border: 1px #999999 solid;
+                color: #F2F6FC;
+                background: linear-gradient(135deg, #6a11cb 0%, #25fc66 100%);
+                box-shadow: 0 4px 8px rgba(250, 249, 249, 0.1);
+                border-radius: 20px;
+                cursor: move;
+                user-select: none;
+                &::before {
+                    content: '';
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    bottom: 0;
+                    right: 0;
+                    z-index: 5;
+                }
+                .label {
+                    position: absolute;
+
+                    top: 0;
+                    left: 10;
+                    padding: 6px;
+                    background-color: rgb(95, 137, 160);
+                    border-radius: 15px;
+                }
+            }
+        }
+    }
+    &-right {
+        right: 0;
+        color: #5CD9AE;
+        border: 1px solid #0a0a0a;
+        border-radius: 4pxrgb(247, 250, 249)
+        
+    }
+    &-top {
+        position: absolute;
+        background: linear-gradient(135deg, #6a11cb 0%, #25fc66 100%);
+        box-shadow: 0 4px 8px rgba(16, 16, 16, 0.1);
+        left: 260px;
+        right: 260px;
+        height: 90px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        opacity: 0; /* 初始透明度 */
+        transform: translateY(-30px); /* 初始位移到上方 */
+        transition: opacity 0.5s ease, transform 0.5s ease; /* 过渡效果 */
+        &-button {
+            width: 60px;
+            height: 60px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: rgba(0,0,0,0.3);
+            color: #5CD9AE;
+            border: 1px solid #5CD9AE;
+            border-radius: 4px;
+            &+& {
+                margin-left: 12px;
+            }
+            &:active {
+                background-color: rgba(92, 161, 217, 0.5); /* 点击时背景颜色变化 */
+                color: #000000; /* 点击时文字颜色变化 */
+            }
+        }
+    }
+    /* 当鼠标悬停在 .top 上时，显示内容 */
+        &-top:hover {
+        opacity: 1; /* 透明度为1 */
+        transform: translateY(0); /* 回到原来的位置 */
+        }
+    &-container {
+        padding: 100px 260px 10px;
+        width: 100%;
+        height: 100%;
+        &-content {
+            height: 100%;
+            border-top: 2px solid black;
+            overflow: auto;
+            &_canvas {
+                width: 100%;
+                height: 100%;
+                position: relative;
+                background-color: #f9f8f8;
+                box-shadow: 0 4px 8px rgba(199, 199, 200, 0.1);
+            }
+        }
+        
+    }
+}
+
+
+.editor-block {
+    position: absolute;
+    &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+        z-index: 5;
+    }
+}
+
+.editor-block-focus {
+    &::before {
+        border: 2px dashed red;
+    }
+}
+
+.line-x {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    border-left: 1px dashed red;
+}
+
+.line-y {
+    position: absolute;
+    left: 0;
+    right: 0;
+    border-top: 1px dashed red;
+}
