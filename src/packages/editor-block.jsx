@@ -1,11 +1,12 @@
+// 获取主组件中对应函数的所有内容，包括主组件获取到的其余子组件
 import { computed, defineComponent,inject, onMounted, ref, watch } from "vue";
-// 画布区域 每个单独的组件
+// 这一部分是画布区域内容块（editor.jsx中{/* 内容区域 */}）（拖入组件）的配置信息。对应每个单独的组件位置
 export default defineComponent({
     props: {
         block: {type: Object}
     },
     setup(props) {
-        const config = inject('config')
+        const config = inject('config')//注入方法直接获取主组件的config依赖项，里面有key属性，inject 用于接收上层组件使用 provide 提供的数据
         const blockStyle = computed(() => {
             return {
                 top: props.block.top + 'px',
@@ -25,6 +26,7 @@ export default defineComponent({
             props.block.height = offsetHeight
         })
         return () => {
+            //通过block的key属性（block的key属性是由主组件里config获取到的）直接获取对应的组件
             const component = config.componentMap[props.block.key]
             return <div style={blockStyle.value} class="editor-block" ref={blockRef}>{component.render()}</div>
         }

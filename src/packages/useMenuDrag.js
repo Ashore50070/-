@@ -1,7 +1,7 @@
 import { events } from "./events";
 
 /**
- * 实现菜单拖拽到画布
+ * 实现菜单(左侧栏)拖拽到画布
  * @param {ElementRef} containerRef dom元素
  * @param {Object} data 已经注册的菜单组件数据 
  */
@@ -36,6 +36,7 @@ export function useMenuDrag (containerRef, data) {
     const dragleave = (e) => {
         e.dataTransfer.dropEffect = 'none'
     }
+    //当我对组件进行拖拽，释放的时候，对释放的组件，实现居中操作
     const drop = (e) => {
         data.value = {
             ...data.value,

@@ -1,3 +1,4 @@
+//对于画布中的组件，点击后就可以进行托拽的功能了
 import { ref } from "vue"
 import { events } from "./events"
 /**
