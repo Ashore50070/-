@@ -124,7 +124,7 @@
         &-content {
             height: 100%;
             border-top: 2px solid black;
-            background-color: #0af9a5;
+            background-color: #15ad78;
             border: 1px solid rgb(245, 243, 243);
             overflow: auto;
             &_canvas {
@@ -132,7 +132,7 @@
                 width: 100%;
                 height: 100%;
                 position: relative;
-                color: #2b8def;
+                color: #f82727;//字体颜色
                 background-color: #1e1e1e;
                 box-shadow: 0 4px 8px rgba(199, 199, 200, 0.1);
             }
@@ -144,30 +144,21 @@
 
 .editor-block {
     position: absolute;
+    //CSS ::before伪元素，它用于在选定元素的内容前插入内容
     &::before {
         content: '';
-        opacity: 0;  // 设置透明度，使得文字可见
-        position: absolute;
-        top: 0;
-        left: 0;
-        bottom: 0;
-        right: 0;
-        z-index: 1;
-        background-color: #e90f0f;
+        font-size: 20px;
+         position: absolute;
+         top: -30px;
+         left: 20%;
+        // bottom: 0;
+        // right: 0;
+        // z-index: 0;
+        // background-color: #e90f0f;
     }
 }
 
-// .custom-line-icon {
-//     color: red;       /* 图标颜色 */
-//     font-size: 24px;  /* 图标大小 */
-// }
 
-.editor-block-focus {
-    &::before {
-        border: 2px dashed rgb(0, 255, 221);
-
-    }
-}
 
 .editor-botton {
     background-color: #1e1e1e;    /* 背景颜色为黑色 */

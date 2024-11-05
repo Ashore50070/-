@@ -23,5 +23,7 @@ provide('config', config)//将配置的组件直接传入
   left: 10px;
   bottom: 10px;
   right: 10px;
+  z-index: 10;
 }
+
 </style>

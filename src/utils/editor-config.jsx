@@ -1,10 +1,13 @@
 import { ElInput, ElButton } from 'element-plus';
-import { Minus } from '@element-plus/icons-vue';  // 引入线段图标
+
+
 
 /**
  * 定义一个 editorConfig 函数 来增加可拖拽组件，用来显示内容区的所有组件物料
  * 并且返回出去 让外面可以拿到
  */
+
+
 
 function createEditorConfig() {
     //定义一个组件列表
@@ -25,69 +28,168 @@ function createEditorConfig() {
 
 }
 export let editorConfig = createEditorConfig()
-// editorConfig.registrer({
-//     label: '文本',
-//     preview: () => <div></div>,
-//     render: () => <div>渲染文本</div>,
-//     key: 'text'
-// })
-// editorConfig.registrer({
-//     label: '按钮',
-//     preview: () => <ElButton></ElButton>,
-//     render: () => <ElButton>渲染按钮</ElButton>,
-//     key: 'button'
-// })
-// editorConfig.registrer({
-//     label: '输入框',
-//     preview: () => <ElInput placeholder='' />,
-//     render: () => <ElInput placeholder='渲染输入框' />,
-//     key: 'input'
-// })
-editorConfig.registrer({
-    label: '文本',
-    // 配置组建的映射关系，拖入画布区域container部分前和后
-    preview: () => '',
-    render: () => '文本',
-    key: 'text'
-})
-editorConfig.registrer({
-    label: '连接线',
-    preview: () => <div></div>,
-    render: () => <div style={{
-        width: '100px',        // 线段的长度
-        height: '2px',         // 线段的高度
-        backgroundColor: 'red',  // 线段的颜色
-        margin: '20px auto' }}></div>,
-    key:'line'
-});
+
 editorConfig.registrer({
     label: '按钮',
-    preview: () => <div style={{ fontSize: '10%' , display: 'inline-block'}}></div>,
-    render: () => <div style={{ fontSize: '2%' , display: 'inline-block',border: '1px solid black', padding: '50px',borderRadius:'4px'}}>按钮</div>,
+    preview: () => <div></div>,
+    render: () => (
+        <div style={{ position: 'relative', display: 'inline-block' }}>
+            <span 
+                style={{ 
+                    position: 'absolute', 
+                    top: '-30px',  // 根据需要调整文字与按钮之间的距离
+                    left: '50%', 
+                    transform: 'translateX(-50%)',  // 使文字水平居中
+                    fontSize: '20px',
+                    color: '#00ffff'  // 设置文字颜色
+                }}
+            >
+                组件1
+            </span>
+            <div
+                style={{ 
+                    width: '150px', 
+                    height: '100px',
+                    fontSize: '20px',
+                    backgroundColor: '#626aef',
+                    borderRadius: '10px',
+                    border: '1px solid #ffffff'
+                }} 
+            >
+                {/* 直接使用全局注册的图标 */}
+                <PictureFilled 
+                style={{
+                    width: '150px', 
+                    height: '100px',
+                    color:'#ffffff'
+                }}/>
+            </div>
+        </div>
+    ),
     key: 'button'
-})
-// editorConfig.registrer({
-//     label: '按钮',
-//     preview: () => <ElButton></ElButton>,
-//     render: () => <ElButton>按钮</ElButton>,
-//     key: 'button'
-// })
-editorConfig.registrer({
-    label: '输入框',
-    preview: () => <div style={{ fontSize: '20%' , display: 'inline-block'}}></div>,
-    render: () => <div style={{ fontSize: '10%', display: 'inline-block' ,border: '1px solid black', padding: '50px',borderRadius:'4px'}}>输入框</div>,
-    key: 'input'
-})
+});
 editorConfig.registrer({
     label: '文本',
-    preview: () => <div style={{ fontSize: '20%' ,display: 'inline-block' }}></div>,
-    render: () => <div style={{ fontSize: '20%' ,display: 'inline-block' ,border: '1px solid black', padding: '50px',borderRadius:'4px'}}>文本</div>,
-    key: 'text'
-})
+    preview: () => <div></div>,
+    render: () => (
+        <div style={{ position: 'relative', display: 'inline-block' }}>
+            <span 
+                
+                style={{ 
+                    
+                    position: 'absolute', 
+                    top: '-30px',  // 根据需要调整文字与按钮之间的距离
+                    left: '50%', 
+                    transform: 'translateX(-50%)',  // 使文字水平居中
+                    fontSize: '20px',
+                    color: '#59d0a7'  // 设置文字颜色
+                }}
+            >
+                组件2
+            </span>
+            <div 
+                style={{ 
+                    width: '150px', 
+                    height: '100px',
+                    fontSize: '20px',
+                    backgroundColor: '#F56C6C',
+                    borderRadius: '10px',
+                    border: '1px solid #ffffff'
+                }} 
+            >
+                {/* 直接使用全局注册的图标 */}
+                <Star style={{
+                            width: '150px', 
+                            height: '100px',
+                            color: '#ffffff'
+                }} />
+            </div>
+        </div>
+    ),
+    key: 'text1'
+});
 editorConfig.registrer({
     label: '文本',
-    preview: () => <div style={{ fontSize: '20%' ,display: 'inline-block'}}></div>,
-    render: () => <div style={{ fontSize: '20%' ,display: 'inline-block' ,border: '1px solid black', padding: '50px',borderRadius:'4px'}}>文本</div>,
-    key: 'text'
-})
+    preview: () => <div></div>,
+    render: () => (
+        <div style={{ position: 'relative', display: 'inline-block' }}>
+            <span 
+                
+                style={{ 
+                    
+                    position: 'absolute', 
+                    top: '-30px',  // 根据需要调整文字与按钮之间的距离
+                    left: '50%', 
+                    transform: 'translateX(-50%)',  // 使文字水平居中
+                    fontSize: '20px',
+                    color: '#59d0a7'  // 设置文字颜色
+                }}
+            >
+                组件3
+            </span>
+            <div 
+                style={{ 
+                    width: '150px', 
+                    height: '100px',
+                    fontSize: '20px',
+                    backgroundColor: '#F56C6C',
+                    borderRadius: '10px',
+                    border: '1px solid #ffffff'
+                }} 
+            >
+                {/* 直接使用全局注册的图标 */}
+                <DataAnalysis  style={{
+                            width: '150px', 
+                            height: '100px',
+                            color: '#ffffff'
+                }} />
+            </div>
+        </div>
+    ),
+    key: 'text2'
+});
+editorConfig.registrer({
+    label: '文本',
+    preview: () => <div></div>,
+    render: () => (
+        <div style={{ position: 'relative', display: 'inline-block' }}>
+            <span 
+                
+                style={{ 
+                    
+                    position: 'absolute', 
+                    top: '-30px',  // 根据需要调整文字与按钮之间的距离
+                    left: '50%', 
+                    transform: 'translateX(-50%)',  // 使文字水平居中
+                    fontSize: '20px',
+                    color: '#59d0a7'  // 设置文字颜色
+                }}
+            >
+                组件4
+            </span>
+            <div 
+                style={{ 
+                    width: '150px', 
+                    height: '100px',
+                    fontSize: '20px',
+                    backgroundColor: '#F56C6C',
+                    borderRadius: '10px',
+                    border: '1px solid #ffffff'
+                }} 
+            >
+                {/* 直接使用全局注册的图标 */}
+                <DocumentCopy style={{
+                            width: '150px', 
+                            height: '100px',
+                            color: '#ffffff'
+                }} />
+            </div>
+        </div>
+    ),
+    key: 'text3'
+});
+
+
+
+
 
