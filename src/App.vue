@@ -3,8 +3,7 @@ import { ref, provide } from 'vue'
 import data from './data.json'
 import Editor from './packages/editor.jsx'
 let state = ref(data)//定义data数据源的响应式，可以让template中（放入的全部组件）全部接受到
-import {editorConfig as config} from './utils/editor-config.jsx'//拿到子组件的配置editorConfig并写为config
-provide('config', config)//将配置的组件直接传入
+
 </script>
 
 <template>

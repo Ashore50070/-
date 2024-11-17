@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>简化版编辑器</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .editor {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        .card {
+            position: absolute;
+            width: 150px;
+            height: 100px;
+            background-color: #4CAF50;
+            border-radius: 10px;
+            border: 2px solid #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 16px;
+            color: #fff;
+            font-weight: bold;
+            cursor: move;
+        }
+
+        .node {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: #ff5722;
+            cursor: pointer;
+        }
+
+        .link {
+            stroke: black;
+            stroke-width: 2;
+            fill: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="editor" id="editor">
+        <div class="card" id="card1" style="top: 100px; left: 100px;">
+            <div class="node" style="top: 45%; left: -15px;" data-node="in1"></div> <!-- 输入节点 -->
+            <div class="node" style="top: 45%; right: -15px;" data-node="out1"></div> <!-- 输出节点 -->
+            卡片1
+        </div>
+
+        <div class="card" id="card2" style="top: 300px; left: 300px;">
+            <div class="node" style="top: 45%; left: -15px;" data-node="in2"></div> <!-- 输入节点 -->
+            <div class="node" style="top: 45%; right: -15px;" data-node="out2"></div> <!-- 输出节点 -->
+            卡片2
+        </div>
+
+        <svg id="svgContainer" style="position: absolute; width: 100%; height: 100%; pointer-events: none;">
+            <g id="linksContainer"></g>
+        </svg>
+    </div>
+
+    <script>
+        const editor = document.getElementById('editor');
+        const linksContainer = document.getElementById('linksContainer');
+        let currentLink = null;
+        let isDraggingCard = false;
+        let dragOffset = { x: 0, y: 0 };
+        let activeCard = null;
+        let links = []; // 保存连接信息
+    
+        const cards = Array.from(document.querySelectorAll('.card'));
+        const nodes = Array.from(document.querySelectorAll('.node'));
+    
+        nodes.forEach(node => {
+            node.addEventListener('mousedown', startDragLink);
+        });
+    
+        cards.forEach(card => {
+            card.addEventListener('mousedown', startDragCard);
+        });
+    
+        function startDragLink(e) {
+            const nodeId = e.target.getAttribute('data-node');
+            const cardId = e.target.closest('.card').id;
+    
+            currentLink = {
+                source: { node: nodeId, card: cardId, x: e.clientX, y: e.clientY },
+                target: null
+            };
+        }
+    
+        function startDragCard(e) {
+            isDraggingCard = true;
+            activeCard = e.currentTarget;
+    
+            const rect = activeCard.getBoundingClientRect();
+            dragOffset.x = e.clientX - rect.left;
+            dragOffset.y = e.clientY - rect.top;
+    
+            e.stopPropagation();
+        }
+    
+        document.addEventListener('mousemove', (e) => {
+            if (currentLink) {
+                drawCurrentLink(e.clientX, e.clientY);
+            } else if (isDraggingCard && activeCard) {
+                moveCard(e);
+            }
+        });
+    
+        document.addEventListener('mouseup', (e) => {
+            if (currentLink) {
+                finalizeLink(e.clientX, e.clientY);
+            }
+            isDraggingCard = false;
+            activeCard = null;
+        });
+    
+        function moveCard(e) {
+            const x = e.clientX - dragOffset.x;
+            const y = e.clientY - dragOffset.y;
+    
+            activeCard.style.left = `${x}px`;
+            activeCard.style.top = `${y}px`;
+    
+            updateLinks(); // 更新连接线位置
+        }
+    
+        function drawCurrentLink(x, y) {
+            const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            const sourceCard = document.getElementById(currentLink.source.card);
+            const sourceNode = sourceCard.querySelector(`[data-node="${currentLink.source.node}"]`);
+    
+            const startX = sourceNode.getBoundingClientRect().left + sourceNode.offsetWidth / 2;
+            const startY = sourceNode.getBoundingClientRect().top + sourceNode.offsetHeight / 2;
+            
+            const d = `M${startX} ${startY} L${x} ${y}`;
+            path.setAttribute('d', d);
+            path.setAttribute('class', 'link');
+            linksContainer.innerHTML = ''; // 清除之前的临时连接线
+            linksContainer.appendChild(path);
+        }
+    
+        function finalizeLink(x, y) {
+            if (!currentLink) return;
+    
+            const targetNode = document.elementFromPoint(x, y)?.closest('.node');
+            if (targetNode) {
+                const sourceCard = document.getElementById(currentLink.source.card);
+                const sourceNode = sourceCard.querySelector(`[data-node="${currentLink.source.node}"]`);
+                const targetCard = targetNode.closest('.card');
+                const targetNodeId = targetNode.getAttribute('data-node');
+    
+                const linkData = {
+                    source: { card: currentLink.source.card, node: currentLink.source.node },
+                    target: { card: targetCard.id, node: targetNodeId }
+                };
+    
+                links.push(linkData);
+                drawLink(linkData);
+            }
+    
+            currentLink = null;
+        }
+    
+        function drawLink(linkData) {
+            const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    
+            const sourceCard = document.getElementById(linkData.source.card);
+            const sourceNode = sourceCard.querySelector(`[data-node="${linkData.source.node}"]`);
+            const targetCard = document.getElementById(linkData.target.card);
+            const targetNode = targetCard.querySelector(`[data-node="${linkData.target.node}"]`);
+    
+            const startX = sourceNode.getBoundingClientRect().left + sourceNode.offsetWidth / 2;
+            const startY = sourceNode.getBoundingClientRect().top + sourceNode.offsetHeight / 2;
+            const endX = targetNode.getBoundingClientRect().left + targetNode.offsetWidth / 2;
+            const endY = targetNode.getBoundingClientRect().top + targetNode.offsetHeight / 2;
+    
+            const d = `M${startX} ${startY} L${endX} ${endY}`;
+            path.setAttribute('d', d);
+            path.setAttribute('class', 'link');
+            linksContainer.appendChild(path);
+        }
+    
+        function updateLinks() {
+            linksContainer.innerHTML = ''; // 清空所有连接线
+            links.forEach(linkData => drawLink(linkData)); // 重新绘制每条连接线
+        }
+    </script>
+</body>
+</html>
