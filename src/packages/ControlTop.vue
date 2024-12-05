@@ -11,7 +11,7 @@
                 :style="{
                     width: '50px', 
                     height: '50px',
-                    color:'#ffffff'
+                    color:'#f4511e'
                 }"/>
         </div>
         <div v-else="isVisible">
@@ -19,7 +19,7 @@
                 :style="{
                     width: '50px', 
                     height: '50px',
-                    color:'#ffffff'
+                    color:'#f4511e'
                 }"/>
         </div>
       </button>
@@ -47,7 +47,7 @@
   <style scoped>
   .control-top {   
     cursor: pointer;
-    background-color:#2c2c2c;
+    background-color:#ffffff;
     border: '2px solid #2c2c2c';
     border: none; /* 去掉边框*/
     position: absolute;  /* 确保按钮位置可以自由调整 */

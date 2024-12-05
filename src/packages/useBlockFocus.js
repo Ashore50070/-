@@ -6,7 +6,14 @@ import { computed, ref } from 'vue'
  */
 export function useBlockFocus (data, callback) {
     const selectIndex = ref(-1) // 当前被选中的block的索引
-    const laseSelectBlock = computed(() => data.value.blocks[selectIndex.value])
+
+    
+    const laseSelectBlock = computed(() =>{ 
+        
+         return data.value.blocks[selectIndex.value]
+        }
+    )
+    
 
     const clearBlockFocus = () => {//遍历实现其余未被点击的组件都清空focus
         data.value.blocks.forEach(block => {

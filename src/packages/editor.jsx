@@ -1,4 +1,4 @@
-import { computed, defineComponent, ref } from "vue";
+import { computed, defineComponent, ref, watch } from "vue";
 import TogglePanel from './TogglePanel.vue';
 import ControlTop from './ControlTop.vue';
 import { RollbackOutlined, RetweetOutlined, CloudUploadOutlined, CloudDownloadOutlined, VerticalAlignTopOutlined, VerticalAlignBottomOutlined, DeleteOutlined } from '@ant-design/icons-vue';
@@ -9,92 +9,10 @@ import { useBlockFocus } from './useBlockFocus';
 import { useBlockDrag } from "./useBlockDrag";
 import { useCommand } from "./useCommand";
 import { $dialog } from "@/components/Dialog.jsx";
-
-// 创建组件配置
-const componentList = [];
-const componentMap = {};
-
-const registerComponent = (options) => {
-    componentList.push(options);
-    componentMap[options.key] = options;
-};
-
-// 注册组件
-registerComponent({
-    label: '按钮',
-    preview: () => <div style={{width: '100px', height: '100px',color:'black', margin: '0 auto',backgroundColor: '#ff6347',borderRadius: '10px', border: '1px solid #ffffff',display: 'flex', alignItems: 'center',justifyContent: 'center',textAlign:'center'}}>按钮</div>,
-    render: () => (
-        <div style={{ position: 'relative', display: 'inline-block' }}>
-            <span style={{ position: 'absolute', top: '-30px', left: '50%', transform: 'translateX(-50%)', fontSize: '20px', color: '#00ffff' }}>组件1</span>
-            <div style={{ width: '150px', height: '100px', backgroundColor: '#626aef', borderRadius: '10px', border: '1px solid #ffffff' }}>
-                <PictureFilled 
-                    style={{
-                    width: '150px', 
-                    height: '100px',
-                    color:'#ffffff'
-                }}/>
-            </div>
-        </div>
-    ),
-    key: 'button'
-});
-
-registerComponent({
-    label: '文本',
-    preview: () => <div style={{width: '100px', height: '100px',color:'black', margin: '0 auto',backgroundColor: '#ff6347',borderRadius: '10px', border: '1px solid #ffffff',display: 'flex', alignItems: 'center',justifyContent: 'center',textAlign:'center'}}>文本预览</div>,
-    render: () => (
-        <div style={{ position: 'relative', display: 'inline-block' }}>
-            <span style={{ position: 'absolute', top: '-30px', left: '50%', transform: 'translateX(-50%)', fontSize: '20px', color: '#59d0a7' }}>组件2</span>
-            <div style={{ width: '150px', height: '100px', backgroundColor: '#F56C6C', borderRadius: '10px', border: '1px solid #ffffff' }}>
-                {/* 直接使用全局注册的图标 */}
-                <Star style={{
-                    width: '150px', 
-                    height: '100px',
-                    color: '#ffffff'
-                }} />
-            </div>
-        </div>
-    ),
-    key: 'text1'
-});
-
-registerComponent({
-    label: '文本块',
-    preview: () => <div style={{width: '100px', height: '100px',color:'black', margin: '0 auto',backgroundColor: '#ff6347',borderRadius: '10px', border: '1px solid #ffffff',display: 'flex', alignItems: 'center',justifyContent: 'center',textAlign:'center'}}>文本块预览</div>,
-    render: () => (
-        <div style={{ position: 'relative', display: 'inline-block' }}>
-            <span style={{ position: 'absolute', top: '-30px', left: '50%', transform: 'translateX(-50%)', fontSize: '20px', color: '#59d0a7' }}>组件3</span>
-            <div style={{ width: '150px', height: '100px', backgroundColor: '#FF6347', borderRadius: '10px',border: '1px solid #ffffff' }}>
-            {/* 直接使用全局注册的图标 */}
-            <DataAnalysis  style={{
-            width: '150px', 
-            height: '100px',
-            color: '#ffffff'
-            }} />
-            </div>
-        </div>
-    ),
-    key: 'text2'
-});
-
-registerComponent({
-    label: '文档',
-    preview: () => <div style={{width: '100px', height: '100px',color:'black', margin: '0 auto',backgroundColor: '#ff6347',borderRadius: '10px', border: '1px solid #ffffff',display: 'flex', alignItems: 'center',justifyContent: 'center',textAlign:'center'}}>文档预览</div>,
-    render: () => (
-        <div style={{ position: 'relative', display: 'inline-block' }}>
-            <span style={{ position: 'absolute', top: '-30px', left: '50%', transform: 'translateX(-50%)', fontSize: '20px', color: '#59d0a7' }}>组件4</span>
-            <div style={{ width: '150px', height: '100px', backgroundColor: '#FFD700', borderRadius: '10px', border: '1px solid #ffffff' }}>
-                            {/* 直接使用全局注册的图标 */}
-                <DocumentCopy style={{
-                    width: '150px', 
-                    height: '100px',
-                    color: '#ffffff'
-                }} />
-            </div>
-        </div>
-    ),
-    key: 'text3'
-});
+import {componentList, componentMap, componentState, updateComponentProps} from "./componentmodel"; 
+import EditorOpearator from "./Editor-opearator";
+import { ElForm, ElFormItem, ElInput, ElSelect, ElOption, ElButton, ElInputNumber ,ElIcon} from "element-plus";
+import paymentIcon from '@/images/待付款.svg'; // 使用 import 导入图片
 
 export default defineComponent({
     props: {
@@ -107,6 +25,8 @@ export default defineComponent({
             get: () => props.modelValue,//定义一个计算属性data，每次返回结果自动反回取值props.modelValue，也就是获取data
             set: (newVal) => emit("update:modelValue", newVal)
         });
+    
+        
     
         //定义一个计算属性containerStyle，每次组件自动取值data中container部分的宽高
         const containerStyle = computed(() => {
@@ -131,7 +51,7 @@ export default defineComponent({
         });
 
     
-        const updateLinesOnBlockMove = (block) => {// 更新连接线
+        const updateLinesOnBlockMove = (block) => {// 拖动模块（block）时动态更新连接线的位置,更新连接线
             if (!block || !block.key) {
                 console.error("Block or block key is undefined");
                 return;
@@ -164,26 +84,12 @@ export default defineComponent({
                     }
                 });
             };
-        // lines.value.forEach(line => {
-        //     // 如果连接线的起点是当前移动的块
-        //     if (line.from && line.from.blockId === block.key) {
-        //         line.startX = block.left;
-        //         line.startY = block.top + block.height / 2;  // 设置连接线的起点位置
-        //     }
-        // // 如果连接线的终点是当前移动的块
-        //     if (line.to && line.to.blockId === block.key) {
-        //         const targetBlock = data.value.blocks.find(b => b.key === line.to.blockId);
-        //         if (targetBlock) {
-        //             line.endX = targetBlock.left;
-        //             line.endY = targetBlock.top + targetBlock.height / 2;  // 设置连接线的终点位置
-        //         }
-        //     }
-        // });
-        // };
+
         // 3实现画布中组件拖拽
         const { mouseDown, markLine } = useBlockDrag(foucsData, laseSelectBlock, data,updateLinesOnBlockMove);
     
-        const { commands } = useCommand(data, foucsData);
+        const { commands } = useCommand(data, foucsData,lines);
+
         
         const buttons = [
             {
@@ -242,52 +148,35 @@ export default defineComponent({
         const handleToggleTop = () => {
             isTopVisible.value = !isTopVisible.value;
         };
+        
                // 连接线的处理函数
-            const isDragging = ref(false);  // 新增拖拽标志
-            const startConnection = (block, side, e) => {
-                const { left, top, width, height } = block;
-                let startX, startY;
-                if (side === 'left') {
-                    startX = left;
-                    startY = top + height / 2;
-                } else if (side === 'right') {
-                    startX = left + width;
-                    startY = top + height / 2;
-                } else if (side === 'top') {
-                    startX = left + width / 2;
-                    startY = top;
-                } else if (side === 'bottom') {
-                    startX = left + width / 2;
-                    startY = top + height;
-                }
-                currentLine.value = {
-                    startX,
-                    startY,
-                    endX: startX,
-                    endY: startY,
-                    from: { blockId: block.key, side }
-                };
-                isDragging.value = false; // 初始设置为 false
+        const isDragging = ref(false);  // 新增拖拽标志
+        const startConnection = (block, side, e) => {
+            const { left, top, width, height } = block;
+            let startX, startY;
+            if (side === 'left') {
+                startX = left;
+                startY = top + height / 2;
+            } else if (side === 'right') {
+                startX = left + width;
+                startY = top + height / 2;
+            } else if (side === 'top') {
+                startX = left + width / 2;
+                startY = top;
+            } else if (side === 'bottom') {
+                startX = left + width / 2;
+                startY = top + height;
+            }
+            currentLine.value = {
+                startX,
+                startY,
+                endX: startX,
+                endY: startY,
+                from: { blockId: block.key, side }
             };
-        //     const startConnection = (block, side, e) => {
-        //     const { left, top, width, height } = block;
-        //     const startX = side === 'left' ? left : left + width;
-        //     const startY = top + height / 2;
-        //     currentLine.value = {
-        //         startX,
-        //         startY,
-        //         endX: e.clientX,
-        //         endY: e.clientY,
-        //         from: { blockId: block.key, side }
-        //     };
-        // };
+            isDragging.value = false; // 初始设置为 false
+        };
 
-        // const updateConnection = (e) => {
-        //     if (currentLine.value) {
-        //         currentLine.value.endX = e.clientX;
-        //         currentLine.value.endY = e.clientY;
-        //     }
-        // };
 
         const endConnection = (block, side) => {
             if (currentLine.value) {
@@ -310,13 +199,13 @@ export default defineComponent({
             }
         };
 
-        // const handleMouseMove = (e) => {
-        //     updateConnection(e);
-        // };
+
         const handleMouseMove = (e) => {
             if (currentLine.value) {
-                currentLine.value.endX = e.clientX;
-                currentLine.value.endY = e.clientY;
+                currentLine.value.endX = (e.clientX-300);
+                currentLine.value.endY = (e.clientY-132);
+                // currentLine.value.endX = e.clientX;
+                // currentLine.value.endY = e.clientY;
                 isDragging.value = true; // 鼠标移动时设置为 true，开始绘制连接线
             }
         };
@@ -338,7 +227,7 @@ export default defineComponent({
             // 如果当前正在绘制连接线，并且没有连接到另一个节点，则保存连接线
             if (currentLine.value) {
                 // 找到释放位置上的目标节点
-                const targetBlock = findTargetBlock(e.clientX, e.clientY);
+                const targetBlock = findTargetBlock(e.clientX-300, e.clientY-132);
         
                 if (targetBlock) {
                     // 连接到目标节点
@@ -367,17 +256,154 @@ export default defineComponent({
                         ))}
                     </div>
                 )}
-                
+
+
                 <TogglePanel>
-                    <div class="editor-left">
-                        {componentList.map((item, index) => (
-                            <div key={index} draggable onDragstart={(e) => handleDragstart(e, item)} onDragend={handleDragEnd}>
-                                {item.preview()}
-                            </div>
-                        ))}
+                    <div className="editor-left">
+                    <ElIcon><Bell /></ElIcon>
+                        {/* 数据导入选择框 */}
+                        <ElSelect placeholder="数据导入" style={{ width: '220px', margin: '30px auto', display: 'block' }}>
+                            {componentList
+                                .filter(item => ['button', 'text1'].includes(item.key)) // 过滤出key为'button'和'text1'的组件
+                                .map((item) => (
+                                    <ElOption
+
+                                        key={item.key}
+                                        value={item.key}
+                                        draggable
+                                        onDragstart={(e) => handleDragstart(e, item)}
+                                        onDragend={handleDragEnd}
+                                    >
+                                        {/* 渲染组件的预览内容 */}
+                                        <div>{item.preview()}</div>
+                                    </ElOption>
+                                ))}
+                        </ElSelect>
+                        
+                        {/* 数据处理选择框 */}
+                        <ElSelect placeholder="数据处理" style={{ width: '220px' , margin: '60px auto',display: 'block',}}>
+                            {componentList
+                                .filter(item => ['text2', 'text3'].includes(item.key)) // 过滤出key为'button'和'text1'的组件
+                                .map((item) => (
+                                    <ElOption
+                                        key={item.key}
+                                        value={item.key}
+                                        draggable
+                                        onDragstart={(e) => handleDragstart(e, item)}
+                                        onDragend={handleDragEnd}
+                                    >
+                                        {/* 渲染组件的预览内容 */}
+                                        <div>{item.preview()}</div>
+                                    </ElOption>
+                                ))}
+                        </ElSelect>
+
+                        {/* 工作任务管理选择框 */}
+                        <ElSelect placeholder="工作任务管理" style={{ width: '220px' , margin: '30px auto',display: 'block',}}>
+                            {componentList
+                                .filter(item => ['text4', 'text5'].includes(item.key)) // 过滤出key为'button'和'text1'的组件
+                                .map((item) => (
+                                    <ElOption
+                                        key={item.key}
+                                        value={item.key}
+                                        draggable
+                                        onDragstart={(e) => handleDragstart(e, item)}
+                                        onDragend={handleDragEnd}
+                                    >
+                                        {/* 渲染组件的预览内容 */}
+                                        <div>{item.preview()}</div>
+                                    </ElOption>
+                                ))}
+                        </ElSelect>
+
+                        {/* 算法模型配置选择框 */}
+                        <ElSelect placeholder="算法模型配置" style={{ width: '220px', margin: '60px auto',display: 'block',}}>
+                            {componentList
+                                .filter(item => ['text6', 'text7'].includes(item.key)) // 过滤出key为'button'和'text1'的组件
+                                .map((item) => (
+                                    <ElOption
+                                        key={item.key}
+                                        value={item.key}
+                                        draggable
+                                        onDragstart={(e) => handleDragstart(e, item)}
+                                        onDragend={handleDragEnd}
+                                    >
+                                        {/* 渲染组件的预览内容 */}
+                                        <div>{item.preview()}</div>
+                                    </ElOption>
+                                ))}
+                        </ElSelect>
+                        
+                        {/* 模型训练选择框 */}
+                        <ElSelect placeholder="模型训练" style={{ width: '220px' , margin: '60px auto',display: 'block',}}>
+                            {componentList
+                                .filter(item => ['text8', 'text9'].includes(item.key)) // 过滤出key为'button'和'text1'的组件
+                                .map((item) => (
+                                    <ElOption
+                                        key={item.key}
+                                        value={item.key}
+                                        draggable
+                                        onDragstart={(e) => handleDragstart(e, item)}
+                                        onDragend={handleDragEnd}
+                                    >
+                                        {/* 渲染组件的预览内容 */}
+                                        <div>{item.preview()}</div>
+                                    </ElOption>
+                                ))}
+                        </ElSelect>
+
+                        {/* 模型预测选择框 */}
+                        <ElSelect placeholder="模型预测" style={{ width: '220px' , margin: '60px auto',display: 'block',}}>
+                            {componentList
+                                .filter(item => ['text10', 'text3'].includes(item.key)) // 过滤出key为'button'和'text1'的组件
+                                .map((item) => (
+                                    <ElOption
+                                        key={item.key}
+                                        value={item.key}
+                                        draggable
+                                        onDragstart={(e) => handleDragstart(e, item)}
+                                        onDragend={handleDragEnd}
+                                    >
+                                        {/* 渲染组件的预览内容 */}
+                                        <div>{item.preview()}</div>
+                                    </ElOption>
+                                ))}
+                        </ElSelect>
+
+                        {/* 模型评估选择框 */}
+                        <ElSelect placeholder="模型评估" style={{ width: '220px' , margin: '60px auto',display: 'block',}}>
+                            {componentList
+                                .filter(item => ['text2', 'text3'].includes(item.key)) // 过滤出key为'button'和'text1'的组件
+                                .map((item) => (
+                                    <ElOption
+                                        key={item.key}
+                                        value={item.key}
+                                        draggable
+                                        onDragstart={(e) => handleDragstart(e, item)}
+                                        onDragend={handleDragEnd}
+                                    >
+                                        {/* 渲染组件的预览内容 */}
+                                        <div>{item.preview()}</div>
+                                    </ElOption>
+                                ))}
+                        </ElSelect>
                     </div>
                 </TogglePanel>
-                <div className="editor-right">属性控制栏</div>
+
+               
+                <div className="editor-right">
+                    {/* <EditorOpearator block={laseSelectBlock.value}    modelValue={props.modelValue}>
+                        
+                    </EditorOpearator> */}
+                    {/* <!-- 动态绑定 EditorOperator 的属性 --> */}
+                    <EditorOpearator
+                        block={laseSelectBlock.value}   // 传递当前选中的组件
+                        modelValue={props.modelValue}   // 绑定 modelValue，确保数据双向绑定
+                        updateComponentProps={updateComponentProps}  // 传递更新组件属性的函数
+                    />
+                </div>
+
+                                
                 <div className="editor-botton">结果栏</div>
                 <div class="editor-container" >
                 <div class="editor-container-content_canvas" 
@@ -412,6 +438,8 @@ export default defineComponent({
                                 y2={line.endY}
                                 stroke="#ff6347"
                                 stroke-width="2"
+                                onClick={() => handleLineClick(index)}  // 添加点击事件
+                                style={{ cursor: 'pointer' }} // 鼠标悬停时显示为可点击状态
                             />
                         ))}
                         {isDragging.value && currentLine.value &&(
@@ -431,5 +459,6 @@ export default defineComponent({
                 </div>
             </div>
         );
+        
     }
 });

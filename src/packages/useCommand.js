@@ -2,7 +2,7 @@ import { before, cloneDeep } from 'lodash'
 import { onUnmounted } from 'vue'
 import { events } from "./events"
 
-export function useCommand(data, foucsData) {
+export function useCommand(data, foucsData,lines) {
     const state = {
         // 前进后退需要指针
         current: -1, // 前进后退的索引
@@ -31,43 +31,87 @@ export function useCommand(data, foucsData) {
                 state.queue = queue
             }
 
-            queue.push({redo,undo})
+            // queue.push({redo,undo})
+                    // 将组件和连接线的状态一起保存
+            queue.push({
+                redo,
+                undo,
+                blocksSnapshot: cloneDeep(data.value.blocks),
+                linesSnapshot: cloneDeep(lines.value),
+            });
             state.current = current + 1
         }
     }
 
     // 注册我们需要的命令
+    // registry({
+    //     name: 'redo',
+    //     keyboard: 'ctrl+y',
+    //     execute() {
+    //         return {
+    //             redo() {
+    //                 let item = state.queue[state.current+1] // 找到下一步还原操作
+    //                 if(item) {
+    //                     item.redo & item.redo()
+    //                     state.current++
+    //                 }
+    //             }
+    //         }
+    //     }
+    // })
+    // registry({
+    //     name: 'undo',
+    //     keyboard: 'ctrl+z',
+    //     execute() {
+    //         return {
+    //             redo() {
+    //                 if(state.current == -1) return // 没有可撤销的了
+    //                 let item = state.queue[state.current] // 找到上一步还原
+    //                 if(item) {
+    //                     item.undo & item.undo()
+    //                     state.current--
+    //                 }
+    //             }
+    //         }
+    //     }
+    // })
     registry({
         name: 'redo',
         keyboard: 'ctrl+y',
         execute() {
             return {
                 redo() {
-                    let item = state.queue[state.current+1] // 找到下一步还原操作
-                    if(item) {
-                        item.redo & item.redo()
-                        state.current++
+                    let item = state.queue[state.current + 1];
+                    if (item) {
+                        item.redo && item.redo();
+                        data.value.blocks = cloneDeep(item.blocksSnapshot);
+                        lines.value = cloneDeep(item.linesSnapshot);
+                        state.current++;
                     }
                 }
-            }
+            };
         }
-    })
+    });
+    
     registry({
         name: 'undo',
         keyboard: 'ctrl+z',
         execute() {
             return {
                 redo() {
-                    if(state.current == -1) return // 没有可撤销的了
-                    let item = state.queue[state.current] // 找到上一步还原
-                    if(item) {
-                        item.undo & item.undo()
-                        state.current--
+                    if (state.current === -1) return;
+                    let item = state.queue[state.current];
+                    if (item) {
+                        item.undo && item.undo();
+                        data.value.blocks = cloneDeep(item.blocksSnapshot);
+                        lines.value = cloneDeep(item.linesSnapshot);
+                        state.current--;
                     }
                 }
-            }
+            };
         }
-    })
+    });
+    
     registry({
         name: 'drag', //如果希望将操作放到队列中可以增加一个属性，标识等会儿操作要放到队列中
         pushQueue: true,
@@ -169,24 +213,91 @@ export function useCommand(data, foucsData) {
             }
         }
     })
+    // registry({
+    //     name: 'delete',
+    //     pushQueue: true,
+    //     execute() {
+    //         let state = {
+    //             before: cloneDeep(data.value.blocks) ,
+    //             after: foucsData.value.unfocused // 选中的都删除了 留下的就是没选中的
+    //         }
+    //         return {
+    //             redo() {
+    //                 data.value = {...data.value, blocks: state.after}
+    //             },
+    //             undo() {
+    //                 data.value = {...data.value, blocks: state.before}
+    //             }
+    //         }
+    //     }
+    // })
+    // registry({
+    //     name: 'delete',
+    //     pushQueue: true,
+    //     execute() {
+    //         // 需要删除的组件和连接线的状态
+    //         let state = {
+    //             blocksBefore: cloneDeep(data.value.blocks),
+    //             linesBefore: cloneDeep(lines.value),
+    //             blocksAfter: foucsData.value.unfocused, // 删除选中的组件后剩余的组件
+    //         };
+
+    //         // 获取需要删除的组件
+    //         const blocksToDelete = foucsData.value.focus;
+
+    //         // 删除与这些组件相关的连接线
+    //         let linesAfter = lines.value.filter(line => {
+    //             return !blocksToDelete.some(block => block.key === line.from.blockId || block.key === line.to.blockId);
+    //         });
+
+    //         return {
+    //             redo() {
+    //                 // 删除组件和相关连接线
+    //                 data.value = { ...data.value, blocks: state.blocksAfter };
+    //                 lines.value = linesAfter;
+    //             },
+    //             undo() {
+    //                 // 撤销删除操作，恢复组件和连接线
+    //                 data.value = { ...data.value, blocks: state.blocksBefore };
+    //                 lines.value = state.linesBefore;
+    //             }
+    //         };
+    //     }
+    // });
     registry({
         name: 'delete',
         pushQueue: true,
         execute() {
+            // 需要删除的组件和连接线的状态
             let state = {
-                before: cloneDeep(data.value.blocks) ,
-                after: foucsData.value.unfocused // 选中的都删除了 留下的就是没选中的
-            }
+                blocksBefore: cloneDeep(data.value.blocks),
+                linesBefore: cloneDeep(lines.value),
+                blocksAfter: foucsData.value.unfocused, // 删除选中的组件后剩余的组件
+            };
+    
+            // 获取需要删除的组件
+            const blocksToDelete = foucsData.value.focus;
+    
+            // 删除与这些组件相关的连接线
+            let linesAfter = lines.value.filter(line => {
+                return !blocksToDelete.some(block => block.key === line.from.blockId || block.key === line.to.blockId);
+            });
+    
             return {
                 redo() {
-                    data.value = {...data.value, blocks: state.after}
+                    // 删除组件和相关连接线
+                    data.value = { ...data.value, blocks: state.blocksAfter };
+                    lines.value = linesAfter;
                 },
                 undo() {
-                    data.value = {...data.value, blocks: state.before}
+                    // 撤销删除操作，恢复组件和连接线
+                    data.value = { ...data.value, blocks: state.blocksBefore };
+                    lines.value = state.linesBefore;
                 }
-            }
+            };
         }
-    })
+    });
+    
 
     const keyboardEvent = (() => {
         const keyCodes = {

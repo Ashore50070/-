@@ -13,7 +13,7 @@ import TogglePanel from './TogglePanel.vue';
                 :style="{
                     width: '18px', 
                     height: '18px',
-                    color:'#ffffff'
+                    color:'#f4511e'
                 }"/>
         </div>
         <div v-else="isVisible">
@@ -21,7 +21,7 @@ import TogglePanel from './TogglePanel.vue';
                 :style="{
                     width: '18px', 
                     height: '18px',
-                    color:'#ffffff'
+                    color:'#f4511e'
                 }"/>
         </div>
       </button>
@@ -61,7 +61,7 @@ import TogglePanel from './TogglePanel.vue';
      /* 圆角按钮 */
     cursor: pointer;          /* 鼠标悬停时显示为手型 */
     color:#e58201;
-    background-color: #2c2c2c;
+    background-color: #ffffff;
     display: flex;
     justify-content: center;  /* 控制按钮水平居中 */
     align-items: flex-end;    /* 控制按钮垂直位置到下方 */

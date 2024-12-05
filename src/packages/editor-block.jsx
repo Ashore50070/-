@@ -5,7 +5,6 @@ export default defineComponent({
         block: { type: Object, required: true },
         componentMap: { type: Object, required: true },
         startConnection: { type: Function, required: true },
-        updateConnection: { type: Function, required: true },
         updateLinesOnBlockMove: { type: Function, required: true }, // 新增的 prop
         endConnection: { type: Function, required: true }
     },
@@ -42,7 +41,7 @@ export default defineComponent({
 
         return () => {
             const component = props.componentMap[props.block.key];
-            if (!component) return <div>组件未找到</div>;
+            if (!component) return <div></div>;
 
             return (
                 <div style={blockStyle.value} ref={blockRef} class="editor-block">
