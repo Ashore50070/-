@@ -5,6 +5,7 @@
 https://nodejs.org/zh-cn
 ```
 ### **1.项目建立**
+**Step 1**：下载代码 ```git clone --depth 1 https://github.com/zjunlp/DeepKE.git```（别忘记star和fork哈！！！）
 ```sh
 npm install
 ```
