@@ -28,6 +28,10 @@ npm run build
 - 本项目是的所有组件均放在vue-visual-editor-main\packages中
 ### 1. 左侧物料栏区域
 ![](./src/images/image1.jpg) ![](./src/images/image6.jpg)
+左侧属性栏是一个分层设计的选择界面，主要用于管理不同模块的功能配置。
+#### **操作说明**：
+- 使用下拉框选择需要的组件并拖拽到目标区域。
+- 显示实时的组件预览。
 ### 2. 顶部控制栏区域
 ![](./src/images/image2.jpg)
 ### 3. 中间画布区域
