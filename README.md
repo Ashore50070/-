@@ -27,7 +27,7 @@ npm run build
 ## 🐳具体功能介绍
 - 本项目是的所有组件均放在vue-visual-editor-main\packages中
 ### 1. 左侧物料栏区域
-<img src="./src/images/image1.jpg" alt="左侧物料栏" width="400" height="400">
+<img src="./src/images/image1.jpg" alt="左侧物料栏" width="200" height="400">
 -左侧属性栏是一个分层设计的选择界面，主要用于管理不同模块的功能配置。
 ![](./src/images/image6.jpg)
 #### **操作说明**：
