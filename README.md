@@ -27,4 +27,17 @@ npm run build
 ## 🐳具体功能介绍
 - 本项目是的所有组件均放在vue-visual-editor-main\packages中
 ### 1. 左侧物料栏区域
-![xxx](./src/images/image1.jpg)
+![](./src/images/image1.jpg)
+![](./src/images/image6.jpg)
+### 2. 顶部控制栏区域
+![](./src/images/image2.jpg)
+### 3. 中间画布区域
+![](./src/images/image3.jpg)
+### 4. 右侧属性栏区域
+![](./src/images/image4.jpg)
+![](./src/images/image5.jpg)
+### 4. 整体页面展示
+![](./src/images/image1.gif)
+
+
+
