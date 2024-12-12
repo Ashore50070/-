@@ -5,7 +5,8 @@
 https://nodejs.org/zh-cn
 ```
 ### **1.项目建立**
-**Step 1**：下载代码 ```git clone --depth 1 https://github.com/zjunlp/DeepKE.git```（别忘记star和fork哈！！！）
+**Step 1**：安装项目所需要的所有依赖包，默认使用npm install安装根目录下所有pakeage
+**Step 2**：输入命令
 ```sh
 npm install
 ```
@@ -23,4 +24,6 @@ npm run dev
 ```sh
 npm run build
 ```
-
+## 🐳具体功能介绍
+### 1. 命名实体识别NER
+- 本项目是的所有组件均放在vue-visual-editor-main\packages中
