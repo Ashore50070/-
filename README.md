@@ -27,4 +27,5 @@ npm run build
 ## 🐳具体功能介绍
 - 本项目是的所有组件均放在vue-visual-editor-main\packages中
 ### 1. 左侧物料栏区域
+./src/images/image1.jpg
 
