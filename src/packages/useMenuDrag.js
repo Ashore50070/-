@@ -38,20 +38,29 @@ export function useMenuDrag (containerRef, data) {
     }
     //当我对组件进行拖拽，释放的时候，对释放的组件，实现居中操作
     const drop = (e) => {
+        // 假设当前组件有默认宽高，可以通过 currentComponent 获取
+        const componentWidth = currentComponent.width || 150;  // 组件默认宽度
+        const componentHeight = currentComponent.height || 100; // 组件默认高度
+    
+        // 计算居中位置
+        const centerX = e.offsetX - componentWidth / 2;
+        const centerY = e.offsetY - componentHeight / 2;
+    
+        // 更新数据，放置居中后的组件
         data.value = {
             ...data.value,
             blocks: [
                 ...data.value.blocks,
                 {
-                    top: e.offsetY,
-                    left: e.offsetX,
+                    top: centerY,          // 居中后的 Y 坐标
+                    left: centerX,         // 居中后的 X 坐标
                     zIndex: 1,
                     key: currentComponent.key,
                     alignCenter: true
                 }]
         }
-
-        currentComponent = null
+    
+        currentComponent = null;  // 清空当前组件
     }
     return {
         handleDragstart,

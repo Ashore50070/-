@@ -1,11 +1,11 @@
 
 
 
-import { defineComponent, reactive, watch } from "vue";
+import { defineComponent, reactive, watch ,ref} from "vue";
 import { ElForm, ElFormItem, ElInput, ElSelect, ElOption, ElButton, ElInputNumber } from "element-plus";
 import { componentList } from "./componentmodel";
 import deepcopy from 'deepcopy'; // 确保你引入了 deepcopy 函数
-
+import dataJson from '../data.json'
 export default defineComponent({
   props: {
     block: { type: Object }, // 用户最后选中的元素
@@ -16,11 +16,12 @@ export default defineComponent({
   },
   setup(props, ctx) {
     // 为每个组件维护独立的状态
+    const dataStore =ref(dataJson)
     const componentsState = reactive({});
 
     // 初始化状态
     const state = reactive({
-      editData: deepcopy(props.modelValue.container || { width: 100, height: 100 }), // 默认宽高为 100
+      editData: deepcopy(dataStore.container || { width: 100, height: 100 }), // 默认宽高为 100
     });
 
     // 监听 props.block 变化

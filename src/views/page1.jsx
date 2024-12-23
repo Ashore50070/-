@@ -1,14 +1,15 @@
+
 import { computed, defineComponent, ref, watch } from "vue";
 import { RollbackOutlined, RetweetOutlined, CloudUploadOutlined, CloudDownloadOutlined, VerticalAlignTopOutlined, VerticalAlignBottomOutlined, DeleteOutlined } from '@ant-design/icons-vue';
-import "./editor.scss";
-import EditorBlock from './editor-block';
-import { useMenuDrag } from './useMenuDrag';
-import { useBlockFocus } from './useBlockFocus';
-import { useBlockDrag } from "./useBlockDrag";
-import { useCommand } from "./useCommand";
+import "../packages/editor.scss";
+import EditorBlock from '../packages/editor-block';
+import { useMenuDrag } from '../packages/useMenuDrag';
+import { useBlockFocus } from '../packages/useBlockFocus';
+import { useBlockDrag } from "../packages/useBlockDrag";
+import { useCommand } from "../packages/useCommand";
 import { $dialog } from "@/components/Dialog.jsx";
-import {componentList, componentMap, componentState, updateComponentProps} from "./componentmodel"; 
-import EditorOpearator from "./Editor-opearator";
+import {componentList, componentMap, componentState, updateComponentProps} from "../packages/componentmodel"; 
+import EditorOpearator from "../packages/Editor-opearator";
 import { ElForm, ElFormItem, ElInput, ElSelect, ElOption, ElButton, ElInputNumber ,ElIcon,ElMenu,ElMenuItem,ElSubMenu} from "element-plus";
 import { useRouter } from 'vue-router';
 import dataJson from '../data.json'
@@ -18,7 +19,7 @@ export default defineComponent({
         modelValue: { type: Object }
     },
     emits: ["update:modelValue", "update:blockPosition"], // 确保所有事件都已声明
-    name: 'EditorPage',
+    name: 'HomePage1',
     setup(props, { emit }) {
 
         const dataStore =ref(dataJson)
@@ -289,7 +290,7 @@ export default defineComponent({
                             transition: 'width 0.3s ease',
                             width: isCollapsed.value ? '0' : '100px',
                             overflow: 'hidden',
-                            backgroundColor: '#409EFF',
+                            backgroundColor: '#71b1d1',
                             height: '100%',
                         }}
                     >
@@ -297,34 +298,21 @@ export default defineComponent({
                             default-active={activeIndex.value}
                             background-color="#71b1d1"
                             text-color="#FFF"
-                            active-text-color="#FFFFFF"
+                            active-text-color="#FFD04B"
                             style={{ border: 'none', height: '100%' }}
                         >
                             <ElMenuItem index="1" onClick={navigateToPage1} style={{margin:'0px 0px 10px'}}>
                                 <ElIcon>
-                                    <Monitor />
+                                    <Document />
                                 </ElIcon>
-                                <span>模型</span>
-                            </ElMenuItem>
-                            <ElMenuItem index="2" onClick={navigateToPage2} style={{margin:'0px 0px 10px'}}>
-                                <ElIcon>
-                                    <DataLine />
-                                </ElIcon>
-                                <span>数据</span>
+                                <span>模型1</span>
                             </ElMenuItem>
 
                             <ElMenuItem index="2" onClick={navigateToPage2} style={{margin:'0px 0px 10px'}}>
                                 <ElIcon>
-                                    <Setting />
+                                    <Document />
                                 </ElIcon>
-                                <span>设置</span>
-                            </ElMenuItem>
-
-                            <ElMenuItem index="2" onClick={navigateToPage2} style={{margin:'0px 0px 10px'}}>
-                                <ElIcon>
-                                    <UserFilled />
-                                </ElIcon>
-                                <span>管理</span>
+                                <span>模型2</span>
                             </ElMenuItem>
                         </ElMenu>
                     </div>
@@ -344,81 +332,27 @@ export default defineComponent({
                         </div>
                     </div>
                 )}
+
                 <div className="editor-left">
                     {/* 切换折叠按钮 */}
                     <ElButton
                       type="primary"
                       onClick={() => (isCollapse.value = !isCollapse.value)} // 注意 .value 修改
                       style={{ 
-                        margin: '10px 30% ', 
-                        
+                        margin: '10px 150px ', // 水平居中
+                        width: '40%', // 按钮宽度
                         transition: 'all 0.3s ease',
-                        
                       }}         
                     >
-                      <ElIcon style={{fontSize:'30px'}}>       
-                      {isCollapse.value ? <TurnOff /> : <Open />}
-                      </ElIcon> 
+                      {isCollapse.value ? '展开菜单' : '折叠菜单'}
                     </ElButton>
                     {/* 菜单容器 */}
-                   <div
-                     style={{
-                       width: isCollapse.value ? '64px' : '220px', transition: 'width 0.3s ease-in-out', overflow: 'hidden',  whiteSpace: 'nowrap',backgroundColor: '#fff',padding:'0px 20px 15px',
-                     }}
-                   >
-                     {/* ElMenu */}
-                     <ElMenu
-                       default-active="1"
-                       collapse={isCollapse.value} // 绑定折叠状态
-                       style={{
-                         width: isCollapse.value ? '60px' : '200px', // 动态调整宽度
-                         transformOrigin: 'left', // 从左侧开始展开
-                         borderRight: 'none',
-                         transition: 'all 0.3s ease-in-out', // 菜单本身的过渡效果
-                         
-                       }}
-                     >
-                       <ElSubMenu
-                         index="1"
-                         v-slots={{
-                           title: () => (
-                             <div style={{ display: 'flex', alignItems: 'center' }}>
-                               <ElIcon>
-                                 <FolderChecked />
-                               </ElIcon>
-                               {!isCollapse.value && (
-                                 <span style={{ marginLeft: '8px' ,}}>数据导入</span>
-                               )}
-                             </div>
-                           ),
-                         }}
-                       >
-                          {componentList
-                              .filter(item => ['text2', 'text3'].includes(item.key)) // 过滤出key为'button'和'text1'的组件
-                              .map((item) => (
-                            <ElMenuItem
-                              key={item.key}
-                              index={item.key}
-                              draggable
-                              onDragstart={(e) => handleDragstart(e, item)}
-                              onDragend={handleDragEnd}
-                            >
-                             {/* 渲染图标和文本 */}
-                             <div style={{ display: 'flex', alignItems: 'center' }}>
-                               <ElIcon style={{ marginRight: '8px' }}>
-                                 <DocumentAdd />
-                               </ElIcon>
-                               {!isCollapse.value && <span>{item.label}</span>}
-                             </div>
-                           </ElMenuItem>
-                         ))}
-                       </ElSubMenu>
-                     </ElMenu>
-                   </div>
-                   
+
+
+
                     <div style={{ width: isCollapse.value ? '64px' : '220px', transition: 'width 0.3s ease-in-out', overflow: 'hidden', whiteSpace: 'nowrap', backgroundColor: '#fff', padding: '0px 20px 15px' }}>
                         <ElMenu default-active="1" collapse={isCollapse.value} style={{ width: isCollapse.value ? '60px' : '200px', transformOrigin: 'left', borderRight: 'none', transition: 'all 0.3s ease-in-out' }}>
-                            <ElSubMenu index="1" v-slots={{ title: () => (<div style={{ display: 'flex', alignItems: 'center' }}><ElIcon><DataLine /></ElIcon>{!isCollapse.value && <span style={{ marginLeft: '8px' }}>数据处理</span>}</div>) }}>
+                            <ElSubMenu index="1" v-slots={{ title: () => (<div style={{ display: 'flex', alignItems: 'center' }}><ElIcon><Menu /></ElIcon>{!isCollapse.value && <span style={{ marginLeft: '8px' }}>模型算法配置</span>}</div>) }}>
                                 {componentList.filter(item => ['text2', 'text3'].includes(item.key)).map(item => (
                                     <ElMenuItem key={item.key} index={item.key} draggable onDragstart={(e) => handleDragstart(e, item)} onDragend={handleDragEnd}>
                                         <div style={{ display: 'flex', alignItems: 'center' }}><ElIcon style={{ marginRight: '8px' }}><Bell /></ElIcon>{!isCollapse.value && <span>{item.label}</span>}</div>
@@ -430,31 +364,7 @@ export default defineComponent({
 
                     <div style={{ width: isCollapse.value ? '64px' : '220px', transition: 'width 0.3s ease-in-out', overflow: 'hidden', whiteSpace: 'nowrap', backgroundColor: '#fff', padding: '0px 20px 15px' }}>
                         <ElMenu default-active="1" collapse={isCollapse.value} style={{ width: isCollapse.value ? '60px' : '200px', transformOrigin: 'left', borderRight: 'none', transition: 'all 0.3s ease-in-out' }}>
-                            <ElSubMenu index="1" v-slots={{ title: () => (<div style={{ display: 'flex', alignItems: 'center' }}><ElIcon><Management /></ElIcon>{!isCollapse.value && <span style={{ marginLeft: '8px' }}>工作任务管理</span>}</div>) }}>
-                                {componentList.filter(item => ['text2', 'text3'].includes(item.key)).map(item => (
-                                    <ElMenuItem key={item.key} index={item.key} draggable onDragstart={(e) => handleDragstart(e, item)} onDragend={handleDragEnd}>
-                                        <div style={{ display: 'flex', alignItems: 'center' }}><ElIcon style={{ marginRight: '8px' }}><Bell /></ElIcon>{!isCollapse.value && <span>{item.label}</span>}</div>
-                                    </ElMenuItem>
-                                ))}
-                            </ElSubMenu>
-                        </ElMenu>
-                    </div>
-                    
-                    <div style={{ width: isCollapse.value ? '64px' : '220px', transition: 'width 0.3s ease-in-out', overflow: 'hidden', whiteSpace: 'nowrap', backgroundColor: '#fff', padding: '0px 20px 15px' }}>
-                        <ElMenu default-active="1" collapse={isCollapse.value} style={{ width: isCollapse.value ? '60px' : '200px', transformOrigin: 'left', borderRight: 'none', transition: 'all 0.3s ease-in-out' }}>
-                            <ElSubMenu index="1" v-slots={{ title: () => (<div style={{ display: 'flex', alignItems: 'center' }}><ElIcon><SetUp /></ElIcon>{!isCollapse.value && <span style={{ marginLeft: '8px' }}>模型算法配置</span>}</div>) }}>
-                                {componentList.filter(item => ['text2', 'text3'].includes(item.key)).map(item => (
-                                    <ElMenuItem key={item.key} index={item.key} draggable onDragstart={(e) => handleDragstart(e, item)} onDragend={handleDragEnd}>
-                                        <div style={{ display: 'flex', alignItems: 'center' }}><ElIcon style={{ marginRight: '8px' }}><Bell /></ElIcon>{!isCollapse.value && <span>{item.label}</span>}</div>
-                                    </ElMenuItem>
-                                ))}
-                            </ElSubMenu>
-                        </ElMenu>
-                    </div>
-                    
-                    <div style={{ width: isCollapse.value ? '64px' : '220px', transition: 'width 0.3s ease-in-out', overflow: 'hidden', whiteSpace: 'nowrap', backgroundColor: '#fff', padding: '0px 20px 15px' }}>
-                        <ElMenu default-active="1" collapse={isCollapse.value} style={{ width: isCollapse.value ? '60px' : '200px', transformOrigin: 'left', borderRight: 'none', transition: 'all 0.3s ease-in-out' }}>
-                            <ElSubMenu index="1" v-slots={{ title: () => (<div style={{ display: 'flex', alignItems: 'center' }}><ElIcon><Clock /></ElIcon>{!isCollapse.value && <span style={{ marginLeft: '8px' }}>模型训练</span>}</div>) }}>
+                            <ElSubMenu index="1" v-slots={{ title: () => (<div style={{ display: 'flex', alignItems: 'center' }}><ElIcon><Menu /></ElIcon>{!isCollapse.value && <span style={{ marginLeft: '8px' }}>模型训练</span>}</div>) }}>
                                 {componentList.filter(item => ['text2', 'text3'].includes(item.key)).map(item => (
                                     <ElMenuItem key={item.key} index={item.key} draggable onDragstart={(e) => handleDragstart(e, item)} onDragend={handleDragEnd}>
                                         <div style={{ display: 'flex', alignItems: 'center' }}><ElIcon style={{ marginRight: '8px' }}><Bell /></ElIcon>{!isCollapse.value && <span>{item.label}</span>}</div>
@@ -488,6 +398,7 @@ export default defineComponent({
                             </ElSubMenu>
                         </ElMenu>
                     </div>
+
                 </div>
 
                 
@@ -566,3 +477,10 @@ export default defineComponent({
         
     }
 });
+
+// export default defineComponent({
+//   name: 'HomePage1',
+//   setup() {
+//     return () => <div>页面 1</div>
+//   }
+// })
